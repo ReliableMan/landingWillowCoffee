@@ -1,0 +1,334 @@
+{
+  "currency": "RSD",
+  "categories": [
+    {
+      "id": "coffee",
+      "label": { "ru": "Кофе", "en": "Coffee", "sr": "Kafa" },
+      "groups": [
+        {
+          "items": [
+            { "name": { "en": "Espresso", "sr": "Espresso" }, "price": "250" },
+            { "name": { "en": "Americano", "sr": "Americano" }, "price": "250 / 290" },
+            { "name": { "en": "Filter coffee", "sr": "Filter kafa" }, "price": "250 / 350" },
+            { "name": { "en": "Cappuccino", "sr": "Cappuccino" }, "price": "270 / 350" },
+            { "name": { "en": "Latte", "sr": "Latte" }, "price": "370" },
+            { "name": { "en": "Flat White", "sr": "Flat White" }, "price": "350" },
+            { "name": { "en": "Espresso Tonic", "sr": "Espresso Tonik" }, "price": "380" },
+            { "name": { "en": "Bumble", "sr": "Bumble" }, "price": "490" },
+            {
+              "name": { "en": "Tropical Espresso Tonic", "sr": "Tropski Espresso Tonik" },
+              "desc": {
+                "en": "raspberry & passion fruit purée, espresso, tonic",
+                "sr": "malina pire i pire od marakuje, espreso, tonik"
+              },
+              "price": "450",
+              "badge": "new"
+            },
+            {
+              "name": { "en": "Raf", "sr": "Raf" },
+              "desc": {
+                "en": "bourbon vanilla / citrus / lavender",
+                "sr": "bourbon vanilla raf / citrus raf / lavender raf"
+              },
+              "price": "380 / 450"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "specials",
+      "label": { "ru": "Авторские", "en": "Bar specials", "sr": "Barski specijali" },
+      "groups": [
+        {
+          "title": { "en": "Willow Bar Specials", "sr": "Willow Barski Specijali" },
+          "highlight": true,
+          "items": [
+            {
+              "name": { "en": "Matcha / Hojicha Latte", "sr": "Matcha / Hojicha Latte" },
+              "desc": { "en": "matcha / hojicha, milk", "sr": "matcha / hojicha, mleko" },
+              "price": "550"
+            },
+            {
+              "name": { "en": "Matcha with berries", "sr": "Matcha sa bobičastim voćem" },
+              "desc": {
+                "en": "matcha, coconut milk, whipping cream, berry purée",
+                "sr": "matcha, kokosovo mleko, slatka pavlaka, pire od bobičastog voća"
+              },
+              "price": "650"
+            },
+            {
+              "name": { "en": "Matcha with black currant", "sr": "Matcha sa crnom ribizlom" },
+              "desc": {
+                "en": "matcha, coconut milk, whipping cream, black currant",
+                "sr": "matcha, kokosovo mleko, slatka pavlaka, crna ribizla"
+              },
+              "price": "670"
+            },
+            {
+              "name": {
+                "en": "Black Currant & Lavender Lemonade",
+                "sr": "Limunada sa crnom ribizlom i lavandom"
+              },
+              "desc": { "en": "black currant, lavender flowers", "sr": "crna ribizla, cvetovi lavande" },
+              "price": "450"
+            },
+            {
+              "name": { "en": "Ginger & Cucumber Lemonade", "sr": "Limunada sa đumbirom i krastavcem" },
+              "desc": { "en": "fresh cucumber purée, ginger", "sr": "sveži pire od krastavca, đumbir" },
+              "price": "450"
+            },
+            {
+              "name": { "en": "Cherry & Rosemary Lemonade", "sr": "Limunada sa višnjom i ruzmarinom" },
+              "desc": {
+                "en": "cherry, rosemary, also available as a hot punch",
+                "sr": "višnja, ruzmarin, dostupno i kao topli punč"
+              },
+              "price": "450"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "desserts",
+      "label": { "ru": "Десерты", "en": "Desserts", "sr": "Dezerti" },
+      "groups": [
+        {
+          "items": [
+            {
+              "name": { "en": "Medovik (honey cake)", "sr": "Medovik" },
+              "desc": { "en": "flour, honey, eggs, sugar, milk", "sr": "brašno, med, jaja, šećer, mleko" },
+              "price": "590"
+            },
+            {
+              "name": { "en": "Banoffee", "sr": "Banoffee" },
+              "desc": {
+                "en": "flour, cream cheese, banana, condensed milk, sugar, butter",
+                "sr": "brašno, krem sir, banana, kondenzovano mleko, šećer, puter"
+              },
+              "price": "590"
+            },
+            {
+              "name": { "en": "Lemon Cheesecake", "sr": "Čizkejk sa limunom" },
+              "desc": {
+                "en": "flour, lemon juice, milk, sugar, cream cheese, eggs",
+                "sr": "brašno, limunov sok, mleko, šećer, krem sir, jaja"
+              },
+              "price": "590"
+            },
+            {
+              "name": { "en": "Apple Charlotte", "sr": "Kolač sa jabukom" },
+              "desc": {
+                "en": "flour, apples, sugar, cinnamon, lemon juice (vegan)",
+                "sr": "brašno, jabuke, šećer, cimet, limunov sok (veganski proizvod)"
+              },
+              "price": "490"
+            },
+            {
+              "name": { "en": "Red Velvet", "sr": "Red Velvet" },
+              "desc": {
+                "en": "flour, cocoa, milk, eggs, red food coloring (powder)",
+                "sr": "brašno, kakao, mleko, jaja"
+              },
+              "price": "590"
+            },
+            {
+              "name": { "en": "Ant Hill Cake", "sr": "Mravinjak" },
+              "desc": {
+                "en": "flour, milk, sugar, eggs, walnuts, chocolate",
+                "sr": "brašno, mleko, šećer, jaja, orasi, čokolada"
+              },
+              "price": "490"
+            },
+            {
+              "name": { "en": "Sirok", "sr": "Sirok" },
+              "desc": { "en": "chocolate, milk, sugar", "sr": "čokolada, mleko, šećer" },
+              "price": "490"
+            },
+            {
+              "name": { "en": "Vegan Chocolate Bars", "sr": "Veganski čokoladni barovi" },
+              "desc": {
+                "en": "lactose free, gluten free, sugar free, butter free",
+                "sr": "bez mleka, bez glutena, bez šećera, bez putera"
+              },
+              "price": "490"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "label": { "ru": "Еда", "en": "Food", "sr": "Hrana" },
+      "groups": [
+        {
+          "title": { "en": "Bistro classics", "sr": "Bistro klasici" },
+          "items": [
+            {
+              "name": { "en": "Tomato & Guacamole Tartine", "sr": "Tartin sa paradajzom i gvakamoleom" },
+              "desc": {
+                "en": "homemade tomato jam, guacamole cream, tartine bread",
+                "sr": "domaći džem od paradajza, krem od gvakamolea, tartin hleb (veganski proizvod)"
+              },
+              "price": "630"
+            },
+            {
+              "name": {
+                "en": "Tomato Jam & Cream Cheese Tartine",
+                "sr": "Tartin sa džemom od paradajza i krem sirom"
+              },
+              "desc": {
+                "en": "homemade tomato jam, cream cheese, guacamole, egg, tartine bread",
+                "sr": "domaći džem od paradajza, krem sir, gvakamole, jaje, tartin hleb"
+              },
+              "price": "730"
+            },
+            {
+              "name": { "en": "Prosciutto Tartine", "sr": "Tartin sa pršutom" },
+              "desc": {
+                "en": "prosciutto, arugula, pelati tomatoes, tartine bread",
+                "sr": "pršut, rukola, sušeni paradajz, tartin hleb"
+              },
+              "price": "830"
+            },
+            {
+              "name": { "en": "Salmon & Guacamole Tartine", "sr": "Tartin sa lososom i gvakamoleom" },
+              "desc": {
+                "en": "lightly salted salmon, egg, guacamole cream, tartine bread",
+                "sr": "blago soljeni losos, jaje, krem od gvakamolea, tartin hleb"
+              },
+              "price": "990"
+            },
+            {
+              "name": { "en": "Homemade Syrniki", "sr": "Domaći sirniki" },
+              "desc": {
+                "en": "syrniki (3 pcs), homemade jam, yogurt",
+                "sr": "sirniki (3 kom), domaći džem, jogurt"
+              },
+              "price": "670"
+            },
+            {
+              "name": {
+                "en": "Chicken Liver Pâté with Truffle",
+                "sr": "Pašteta od pileće džigerice sa tartufima"
+              },
+              "desc": {
+                "en": "chicken liver pâté, tartine, arugula, fruit jam, truffle paste",
+                "sr": "pašteta od pileće džigerice, tartin, rukola, voćni džem, pasta od tartufa"
+              },
+              "price": "830"
+            },
+            {
+              "name": {
+                "en": "Potato Bread with Turkey Ham / Salmon",
+                "sr": "Krompir hleb sa ćuretinom / lososom"
+              },
+              "desc": {
+                "en": "homemade potato bread, turkey ham / salmon, arugula, yogurt dressing",
+                "sr": "domaći krompir hleb, rukola, jogurt dresing, ćuretina / losos"
+              },
+              "price": "830 / 930"
+            }
+          ]
+        },
+        {
+          "title": { "en": "Willow Special", "sr": "Willow Specijaliteti" },
+          "highlight": true,
+          "items": [
+            {
+              "name": { "en": "Focaccia with chicken rillettes", "sr": "Fokača sa pilećim rijetom" },
+              "desc": {
+                "en": "focaccia, chicken, mayo, grain mustard, rocket salad, olive oil",
+                "sr": "fokača, piletina, majonez, senf u zrnu, rukola, maslinovo ulje"
+              },
+              "price": "830"
+            },
+            {
+              "name": { "en": "Focaccia with prosciutto", "sr": "Fokača sa pršutom" },
+              "desc": {
+                "en": "focaccia, prosciutto, chopped tomatoes, rocket salad, olive oil",
+                "sr": "fokača, pršut, pelat, rukola, maslinovo ulje"
+              },
+              "price": "890"
+            },
+            {
+              "name": { "en": "Focaccia with Caesar sauce", "sr": "Fokača sa Caesar sosom" },
+              "desc": {
+                "en": "focaccia, chicken, mayo, anchovies, capers, tomato, rocket salad, olive oil",
+                "sr": "fokača, piletina, majonez, inćuni, kapari, paradajz, rukola, maslinovo ulje"
+              },
+              "price": "990"
+            },
+            {
+              "name": { "en": "Focaccia with turkey ham", "sr": "Fokača sa ćuretinom" },
+              "desc": {
+                "en": "focaccia, turkey ham, ricotta, pesto, pear, rocket salad, olive oil",
+                "sr": "fokača, ćuretina, rikota-pesto, kruška, rukola"
+              },
+              "price": "990"
+            }
+          ]
+        },
+        {
+          "title": { "en": "Soups", "sr": "Potaž" },
+          "items": [
+            {
+              "name": { "en": "Pumpkin cream soup", "sr": "Potaž od bundeve" },
+              "desc": {
+                "en": "pumpkin, potato, carrot, onion, garlic, cream, pumpkin seeds, olive oil",
+                "sr": "bundeva, krompir, šargarepa, crni luk, beli luk, pavlaka, semenke od bundeve, maslinovo ulje"
+              },
+              "price": "550"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drinks",
+      "label": { "ru": "Напитки", "en": "Drinks", "sr": "Pića" },
+      "groups": [
+        {
+          "title": { "en": "Soft drinks", "sr": "Bezalkoholna pića" },
+          "items": [
+            {
+              "name": { "en": "Coca Cola / Coca Cola Zero 0,25", "sr": "Coca Cola / Coca Cola Zero 0,25" },
+              "price": "280"
+            },
+            { "name": { "en": "Rosa Gazirana 0,33 / 0,75", "sr": "Rosa Gazirana 0,33 / 0,75" }, "price": "210 / 290" },
+            { "name": { "en": "Rosa 0,33 / 0,75", "sr": "Rosa 0,33 / 0,75" }, "price": "210 / 290" },
+            { "name": { "en": "Orange Fresh Juice", "sr": "Orange Fresh Juice" }, "price": "420" },
+            { "name": { "en": "Cocoa (Madre Cocoa)", "sr": "Cocoa (Madre Cocoa)" }, "price": "370" },
+            {
+              "name": { "en": "Tea", "sr": "Čaj" },
+              "desc": {
+                "en": "earl grey / assam / jasmine / milk oolong / sencha",
+                "sr": "earl grey / assam / jasmine / milk oolong / sencha"
+              },
+              "price": "400"
+            }
+          ]
+        },
+        {
+          "title": { "en": "Alcohol", "sr": "Alkoholna pića" },
+          "items": [
+            { "name": { "en": "Heineken 0,25", "sr": "Heineken 0,25" }, "price": "340" },
+            { "name": { "en": "Kapuziner 0,5", "sr": "Kapuziner 0,5" }, "price": "460" },
+            { "name": { "en": "White wine Žuti Cvet 0,187", "sr": "Belo vino Žuti Cvet 0,187" }, "price": "440" },
+            { "name": { "en": "Rosé wine Barbara 0,187", "sr": "Roze vino Barbara 0,187" }, "price": "420" },
+            { "name": { "en": "Red wine Kardaš 0,187", "sr": "Crveno vino Kardaš 0,187" }, "price": "440" },
+            { "name": { "en": "Rakija Zarić šljiva 0,033", "sr": "Rakija Zarić šljiva 0,033" }, "price": "370" }
+          ]
+        },
+        {
+          "title": { "en": "Local Beer", "sr": "Zanatska piva" },
+          "items": [
+            { "name": { "en": "Kabinet Brka 0,33", "sr": "Kabinet Brka 0,33" }, "price": "440" },
+            { "name": { "en": "Kabinet Wanna Bee Lee 0,33", "sr": "Kabinet Wanna Bee Lee 0,33" }, "price": "440" }
+          ]
+        }
+      ]
+    }
+  ]
+}

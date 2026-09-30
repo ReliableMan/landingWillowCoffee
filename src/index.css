@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/* Палитра снята с меню и афиши Willow We Love */
+@theme {
+  --color-paper: #f0e8dd; /* кремовый фон меню */
+  --color-paper-soft: #f8f3eb; /* карточки на кремовом */
+  --color-ink: #15201a;
+  --color-muted: #5e5d52;
+  --color-line: #d8cdbb;
+  --color-sage: #c5d0bf; /* заглушки фото */
+  --color-accent: #015a2e; /* зелёный блок «Willow Special» */
+  --color-accent-deep: #06381f; /* футер */
+
+  --font-sans: 'Onest', system-ui, sans-serif;
+  --font-display: 'Noto Serif Display', Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+/* Узкая контрастная антиква — как заголовки в меню кофейни */
+@utility display {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
