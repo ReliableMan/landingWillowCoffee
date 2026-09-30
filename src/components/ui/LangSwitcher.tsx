@@ -18,7 +18,8 @@ export function LangSwitcher({ className = '' }: { className?: string }) {
             type="button"
             lang={code}
             title={LANG_NAMES[code]}
-            aria-label={LANG_NAMES[code]}
+            // в имени для скринридера есть и видимая надпись (RU), и полное название языка
+            aria-label={`${code.toUpperCase()}, ${LANG_NAMES[code]}`}
             aria-pressed={active}
             data-lang-option
             onClick={() => setLang(code)}

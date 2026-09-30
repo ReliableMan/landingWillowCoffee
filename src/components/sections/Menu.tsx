@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, type KeyboardEvent } from 'react'
 import { Container } from '@/components/ui/Container'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { fullMenuUrl } from '@/data/content'
@@ -6,6 +6,7 @@ import { menu, menuLangFor, type MenuGroup, type MenuLang } from '@/data/menu'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
 import { Flip, gsap, media, refreshScroll, useGSAP } from '@/lib/gsap'
+import { onceInView } from '@/lib/inView'
 
 const prefersReducedMotion = () => window.matchMedia(media.reduce).matches
 
@@ -66,10 +67,17 @@ export function Menu() {
   const flipState = useRef<Flip.FlipState | null>(null)
   const prevShownId = useRef(shownId)
 
-  // У вкладок разная высота — блоки ниже сдвигаются, точки старта анимаций нужно пересчитать
-  useEffect(() => {
-    refreshScroll()
-  }, [shownId])
+  // Стрелки, Home и End переключают вкладки с клавиатуры
+  const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key]
+    if (step === undefined && e.key !== 'Home' && e.key !== 'End') return
+    e.preventDefault()
+    const tabs = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
+    const index = tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true')
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (index + step! + tabs.length) % tabs.length
+    tabs[next].focus()
+    tabs[next].click()
+  }
 
   // C. Первый показ блока: строки меню появляются по очереди сверху вниз
   useGSAP(
@@ -77,14 +85,15 @@ export function Menu() {
       const mm = gsap.matchMedia()
       mm.add({ motion: media.motion, reduce: media.reduce }, (ctx) => {
         const { reduce } = ctx.conditions as { reduce: boolean }
-        gsap.from('[data-menu-row]', {
+        const rows = gsap.from('[data-menu-row]', {
           y: reduce ? 0 : 16,
           opacity: 0,
           duration: 0.5,
           stagger: 0.05,
           clearProps: 'opacity,transform',
-          scrollTrigger: { trigger: panel.current, start: 'clamp(top 80%)', once: true },
+          paused: true,
         })
+        return onceInView(panel.current, () => rows.play())
       })
     },
     { scope: root },
@@ -124,6 +133,8 @@ export function Menu() {
     () => {
       if (prevShownId.current === shownId) return
       prevShownId.current = shownId
+      // у вкладок разная высота — блоки ниже сдвигаются, точки старта анимаций нужно пересчитать
+      refreshScroll()
       gsap.to(panel.current, { opacity: 1, duration: 0.25, overwrite: true, clearProps: 'opacity' })
       gsap.from('[data-menu-row]', {
         y: prefersReducedMotion() ? 0 : 16,
@@ -156,6 +167,7 @@ export function Menu() {
           data-reveal
           role="tablist"
           aria-label={t.menu.tabsLabel}
+          onKeyDown={onTabKey}
           // isolate + свой фон: текст вкладок смешивается (mix-blend-difference) только с тем, что внутри списка
           className="no-scrollbar isolate -mx-5 flex gap-2.5 overflow-x-auto bg-paper px-5 py-0.5 md:mx-0 md:px-0"
         >
@@ -169,6 +181,8 @@ export function Menu() {
                 id={`menu-tab-${category.id}`}
                 aria-selected={selected}
                 aria-controls="menu-panel"
+                // фокус с Tab попадает только на выбранную вкладку, между вкладками — стрелки
+                tabIndex={selected ? 0 : -1}
                 data-menu-tab
                 onClick={(e) => {
                   if (selected) return
@@ -202,6 +216,7 @@ export function Menu() {
           ref={panel}
           id="menu-panel"
           role="tabpanel"
+          tabIndex={0}
           aria-labelledby={`menu-tab-${shown.id}`}
           className="flex flex-col gap-10"
         >

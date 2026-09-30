@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { marquee } from '@/data/content'
+import { useAfterIntro } from '@/hooks/useAfterIntro'
 import { gsap, media, ScrollTrigger, useGSAP } from '@/lib/gsap'
 
 // Лента повторена несколько раз и за цикл сдвигается ровно на одну копию — шва не видно.
@@ -22,11 +23,13 @@ function Heart() {
 
 export function Marquee() {
   const root = useRef<HTMLDivElement>(null)
+  const shown = useAfterIntro()
 
+  // Лента ниже первого экрана и ничего не прячет — запускаем её после того, как первый экран показан
   useGSAP(
     () => {
       const el = root.current
-      if (!el) return
+      if (!el || !shown) return
       const mm = gsap.matchMedia()
 
       mm.add({ desktop: media.desktop, mobile: media.mobile, reduce: media.reduce }, (ctx) => {
@@ -66,7 +69,7 @@ export function Marquee() {
         })
       })
     },
-    { scope: root },
+    { scope: root, dependencies: [shown] },
   )
 
   return (

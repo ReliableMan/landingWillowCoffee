@@ -1,4 +1,10 @@
-import { Draggable, gsap } from '@/lib/gsap'
+import { Draggable } from 'gsap/Draggable'
+import { InertiaPlugin } from 'gsap/InertiaPlugin'
+import { gsap } from '@/lib/gsap'
+
+// Этот модуль подгружается отдельным файлом (динамический import в Reviews), поэтому плагины карусели
+// регистрируются здесь, а не в lib/gsap.ts. InertiaPlugin даёт перетаскиванию инерцию и доводку до карточки.
+gsap.registerPlugin(Draggable, InertiaPlugin)
 
 // Хелпер бесконечной карусели из документации GSAP (seamless loop), перенесённый на TypeScript.
 // Каждый элемент едет влево по xPercent и, уйдя за левый край, перескакивает в конец ленты.

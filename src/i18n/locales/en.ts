@@ -7,6 +7,7 @@ export const en: Locale = {
       'Willow We Love is a coffee shop and bistro in Belgrade: specialty coffee, signature drinks, tartines, focaccia and homemade desserts.',
   },
   header: {
+    skip: 'Skip to content',
     navLabel: 'Page navigation',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',

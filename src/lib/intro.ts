@@ -11,11 +11,14 @@ export const INTRO = {
 }
 
 const FONT_TIMEOUT = 1500
-// По букве из латиницы, кириллицы и сербской латиницы — чтобы подгрузились нужные части шрифта
-const SAMPLE = 'AaБбŠš'
 
-// Таблица стилей со шрифтами подключена ссылкой и может прийти позже скрипта.
-// Пока её нет, браузер не знает про шрифты, и document.fonts.load() вернётся сразу и впустую.
+// Шрифты разбиты на части по алфавитам, и ждать нужно только те, что нужны тексту на экране:
+// английской версии незачем качать кириллицу. Поэтому образец текста берём со страницы.
+const pageText = (selector: string) =>
+  Array.from(document.querySelectorAll(selector), (el) => el.textContent).join(' ') || 'Aa'
+
+// Если таблица стилей ещё не пришла, браузер не знает про шрифты,
+// и document.fonts.load() вернётся сразу и впустую — сначала ждём её.
 function stylesheetsLoaded() {
   const links = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'))
   return Promise.all(
@@ -33,8 +36,12 @@ function stylesheetsLoaded() {
 async function fontsLoaded() {
   await stylesheetsLoaded()
   const css = getComputedStyle(document.documentElement)
-  const fonts = [`500 1em ${css.getPropertyValue('--font-display')}`, `400 1em ${css.getPropertyValue('--font-sans')}`]
-  await Promise.all(fonts.map((font) => document.fonts.load(font, SAMPLE).catch(() => undefined)))
+  const fonts = [
+    // заголовки всех блоков — шрифтом display, текст первого экрана — основным
+    { font: `500 1em ${css.getPropertyValue('--font-display')}`, text: pageText('h1, h2') },
+    { font: `400 1em ${css.getPropertyValue('--font-sans')}`, text: pageText('header, #hero') },
+  ]
+  await Promise.all(fonts.map(({ font, text }) => document.fonts.load(font, text).catch(() => undefined)))
 }
 
 let ready: Promise<void> | undefined

@@ -7,6 +7,7 @@ import { brand, contacts } from '@/data/content'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
 import { gsap, media, useGSAP } from '@/lib/gsap'
+import { onceInView } from '@/lib/inView'
 
 const rowClass = 'grid grid-cols-[6.5rem_1fr] gap-4'
 const termClass = 'pt-0.5 text-sm text-muted'
@@ -27,36 +28,36 @@ export function Contacts() {
         const { reduce } = ctx.conditions as { reduce: boolean }
 
         // B. Строки контактов появляются по очереди
-        gsap.from('[data-contact-row]', {
+        const rows = gsap.from('[data-contact-row]', {
           y: reduce ? 0 : 20,
           opacity: 0,
           duration: 0.6,
           stagger: 0.08,
           clearProps: 'opacity,transform',
-          scrollTrigger: { trigger: '[data-contact-rows]', start: 'clamp(top 80%)', once: true },
+          paused: true,
         })
 
         // A. Карта раскрывается кругом из центра. 75% — радиус, при котором круг уже закрывает углы блока
-        if (reduce) {
-          gsap.from(map, {
-            opacity: 0,
-            duration: 0.4,
-            clearProps: 'opacity',
-            scrollTrigger: { trigger: map, start: 'clamp(top 80%)', once: true },
-          })
-        } else {
-          gsap.fromTo(
-            map,
-            { clipPath: 'circle(0% at 50% 50%)' },
-            {
-              clipPath: 'circle(75% at 50% 50%)',
-              duration: 1.2,
-              ease: 'power2.inOut',
-              clearProps: 'clipPath',
-              scrollTrigger: { trigger: map, start: 'clamp(top 80%)', once: true },
-            },
-          )
-        }
+        const reveal = reduce
+          ? gsap.from(map, { opacity: 0, duration: 0.4, clearProps: 'opacity', paused: true })
+          : gsap.fromTo(
+              map,
+              { clipPath: 'circle(0% at 50% 50%)' },
+              {
+                clipPath: 'circle(75% at 50% 50%)',
+                duration: 1.2,
+                ease: 'power2.inOut',
+                clearProps: 'clipPath',
+                paused: true,
+              },
+            )
+
+        const el = root.current!
+        const stops = [
+          onceInView(el.querySelector('[data-contact-rows]'), () => rows.play()),
+          onceInView(el.querySelector(map), () => reveal.play()),
+        ]
+        return () => stops.forEach((stop) => stop())
       })
     },
     { scope: root },

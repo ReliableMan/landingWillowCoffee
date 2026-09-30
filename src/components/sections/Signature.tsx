@@ -77,24 +77,9 @@ export function Signature() {
           0,
         )
 
-        // D. Фото внутри карточек слегка отстают, пока лента едет
-        gsap.utils.toArray<HTMLElement>('[data-signature-media]', el).forEach((photo) => {
-          gsap.fromTo(
-            photo,
-            { xPercent: -8 },
-            {
-              xPercent: 8,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: photo.parentElement,
-                containerAnimation: tl,
-                start: 'left right',
-                end: 'right left',
-                scrub: true,
-              },
-            },
-          )
-        })
+        // D. Фото внутри карточек слегка отстают, пока лента едет. Сдвиг идёт в том же таймлайне:
+        // отдельный ScrollTrigger на каждое фото стоил бы шести лишних пересчётов
+        tl.fromTo('[data-signature-media]', { xPercent: -8 }, { xPercent: 8 }, 0)
 
         return () => {
           el.removeAttribute('data-pinned')

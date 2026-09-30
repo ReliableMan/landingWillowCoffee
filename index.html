@@ -11,12 +11,15 @@
       content="Willow We Love is a coffee shop and bistro in Belgrade: specialty coffee, signature drinks, tartines, focaccia and homemade desserts."
     />
     <title>Willow We Love — coffee shop &amp; bistro in Belgrade</title>
-    <!-- Шрифты черновые: подключены ссылкой, чтобы их было легко заменить -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Шрифты лежат в проекте (src/fonts.css). Латинские части нужны на любом языке сайта —
+         грузим их заранее, чтобы стартовая анимация не ждала; кириллица подгружается по необходимости -->
+    <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/onest-latin.woff2" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wdth,wght@0,62.5..100,400..700;1,62.5..100,400..700&family=Onest:wght@400..800&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/src/assets/fonts/noto-serif-display-latin.woff2"
+      crossorigin
     />
   </head>
   <body>

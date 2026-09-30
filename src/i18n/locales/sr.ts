@@ -8,6 +8,7 @@ export const sr: Locale = {
       'Willow We Love je coffee shop i bistro u Beogradu: specialty kafa, autorska pića, tartini, fokača i domaći dezerti.',
   },
   header: {
+    skip: 'Preskoči na sadržaj',
     navLabel: 'Navigacija po stranici',
     openMenu: 'Otvori meni',
     closeMenu: 'Zatvori meni',

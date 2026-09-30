@@ -4,9 +4,11 @@ import { Lightbox } from '@/components/ui/Lightbox'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { brand, galleryColumns } from '@/data/content'
+import { useAfterIntro } from '@/hooks/useAfterIntro'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
-import { gsap, media, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { gsap, media, useGSAP } from '@/lib/gsap'
+import { batchInView } from '@/lib/inView'
 
 // На мобайле две колонки: третья раскладывается в ряд под ними
 const columnClasses = [
@@ -22,6 +24,7 @@ export function Gallery() {
   const { t } = useLang()
   const root = useRef<HTMLElement>(null)
   useReveal(root)
+  const shown = useAfterIntro()
   const gallery = t.gallery
   // Открытое фото: его номер и элемент превью, из которого оно разворачивается
   const [opened, setOpened] = useState<{ index: number; thumb: HTMLElement } | null>(null)
@@ -38,10 +41,10 @@ export function Gallery() {
         const { reduce } = ctx.conditions as { reduce: boolean }
         gsap.set(photos, reduce ? { opacity: 0 } : { clipPath: 'inset(100% 0% 0% 0%)' })
 
-        ScrollTrigger.batch(photos, {
-          start: 'clamp(top 85%)',
-          once: true,
-          onEnter: (batch) => {
+        // фото, вошедшие в экран одновременно, раскрываются по очереди
+        return batchInView(
+          photos,
+          (batch) => {
             ctx.add(() => {
               gsap.to(
                 batch,
@@ -57,25 +60,30 @@ export function Gallery() {
               )
             })
           },
-        })
-      })
-
-      // A. Только десктоп
-      mm.add(`${media.desktop} and ${media.motion}`, () => {
-        gsap.utils.toArray<HTMLElement>('[data-gallery-col]', el).forEach((column, i) => {
-          gsap.fromTo(
-            column,
-            { yPercent: 0 },
-            {
-              yPercent: COLUMN_SHIFT[i],
-              ease: 'none',
-              scrollTrigger: { trigger: '[data-gallery-grid]', start: 'top bottom', end: 'bottom top', scrub: true },
-            },
-          )
-        })
+          0.85,
+        )
       })
     },
     { scope: root },
+  )
+
+  // A. Только десктоп: один таймлайн и один ScrollTrigger на все колонки; настраивается после показа первого экрана
+  useGSAP(
+    () => {
+      const el = root.current
+      if (!el || !shown) return
+      const mm = gsap.matchMedia()
+      mm.add(`${media.desktop} and ${media.motion}`, () => {
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: '[data-gallery-grid]', start: 'top bottom', end: 'bottom top', scrub: true },
+        })
+        gsap.utils.toArray<HTMLElement>('[data-gallery-col]', el).forEach((column, i) => {
+          tl.fromTo(column, { yPercent: 0 }, { yPercent: COLUMN_SHIFT[i] }, 0)
+        })
+      })
+    },
+    { scope: root, dependencies: [shown] },
   )
 
   return (

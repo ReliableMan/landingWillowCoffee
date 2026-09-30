@@ -12,15 +12,25 @@ import { Reviews } from '@/components/sections/Reviews'
 import { Signature } from '@/components/sections/Signature'
 import { useAnchorScroll } from '@/hooks/useAnchorScroll'
 import { useScrollRefresh } from '@/hooks/useScrollRefresh'
+import { useLang } from '@/i18n/useLang'
 
 export default function App() {
   useScrollRefresh()
   useAnchorScroll()
+  const { t } = useLang()
 
   return (
     <>
+      {/* Первая остановка Tab: позволяет с клавиатуры сразу перейти к содержанию, минуя шапку */}
+      <a
+        href="#main"
+        onClick={() => document.getElementById('main')?.focus({ preventScroll: true })}
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-70 focus:rounded-full focus:bg-ink focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-paper"
+      >
+        {t.header.skip}
+      </a>
       <Header />
-      <main>
+      <main id="main" tabIndex={-1} className="outline-none">
         <Hero />
         <Marquee />
         <About />

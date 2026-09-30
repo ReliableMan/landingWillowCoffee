@@ -2,10 +2,12 @@ import { useRef } from 'react'
 import { Container } from '@/components/ui/Container'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { reviewCount } from '@/data/content'
+import { useAfterIntro } from '@/hooks/useAfterIntro'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
-import { gsap, media, ScrollTrigger, useGSAP } from '@/lib/gsap'
-import { horizontalLoop, type LoopTimeline } from '@/lib/horizontalLoop'
+import { gsap, media, useGSAP } from '@/lib/gsap'
+import type { LoopTimeline } from '@/lib/horizontalLoop'
+import { onceInView, watchInView } from '@/lib/inView'
 
 // Лента повторена дважды: так её хватает на бесшовный цикл и на широких экранах
 const COPIES = 2
@@ -18,13 +20,35 @@ export function Reviews() {
   // Пересчитывает, должна ли лента сейчас ехать сама (зависит от наведения, видимости и настроек)
   const sync = useRef(() => {})
   useReveal(root)
+  const shown = useAfterIntro()
   const reviews = t.reviews
 
+  // C. Появление блока: карточки по очереди
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add({ motion: media.motion, reduce: media.reduce }, (ctx) => {
+        const { reduce } = ctx.conditions as { reduce: boolean }
+        const reveal = gsap.from('[data-review-inner]', {
+          y: reduce ? 0 : 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          clearProps: 'opacity,transform',
+          paused: true,
+        })
+        return onceInView(track.current, () => reveal.play())
+      })
+    },
+    { scope: root },
+  )
+
+  // Карусель измеряет каждую карточку — настраиваем её после того, как первый экран показан
   const { contextSafe } = useGSAP(
     () => {
       const el = root.current
       const list = track.current
-      if (!el || !list) return
+      if (!el || !list || !shown) return
       const title = el.querySelector('h2')!
       const items = gsap.utils.toArray<HTMLElement>('[data-review-card]', list)
       const mm = gsap.matchMedia()
@@ -35,68 +59,67 @@ export function Reviews() {
         const autoplay = mouse && !reduce
         let hovered = false
         let inView = false
+        let cancelled = false
+        let cleanup = () => {}
 
-        // A. Бесконечная карусель; B. свайп и перетаскивание мышью (Draggable внутри хелпера)
-        const tl = horizontalLoop(items, {
-          repeat: -1,
-          speed: 0.4,
-          paused: true,
-          draggable: true,
-          paddingRight: parseFloat(getComputedStyle(list).columnGap) || 0,
-          // карточки встают по левому краю заголовка, а не экрана
-          offsetLeft: () => title.getBoundingClientRect().left,
-          onSettle: () => sync.current(),
-        })
-        tl.toIndex(0, { duration: 0 })
-        loop.current = tl
+        // Код карусели (вместе с Draggable) лежит в отдельном файле и подгружается только сейчас
+        import('@/lib/horizontalLoop').then(({ horizontalLoop }) => {
+          if (cancelled) return
+          ctx.add(() => {
+            // A. Бесконечная карусель; B. свайп и перетаскивание мышью (Draggable внутри хелпера)
+            const tl = horizontalLoop(items, {
+              repeat: -1,
+              speed: 0.4,
+              paused: true,
+              draggable: true,
+              paddingRight: parseFloat(getComputedStyle(list).columnGap) || 0,
+              // карточки встают по левому краю заголовка, а не экрана
+              offsetLeft: () => title.getBoundingClientRect().left,
+              onSettle: () => sync.current(),
+            })
+            tl.toIndex(0, { duration: 0 })
+            loop.current = tl
 
-        sync.current = () => {
-          if (autoplay && inView && !hovered) tl.play()
-          else tl.pause()
-        }
+            sync.current = () => {
+              if (autoplay && inView && !hovered) tl.play()
+              else tl.pause()
+            }
 
-        // пауза при наведении
-        const onEnter = () => {
-          hovered = true
-          sync.current()
-        }
-        const onLeave = () => {
-          hovered = false
-          sync.current()
-        }
-        list.addEventListener('mouseenter', onEnter)
-        list.addEventListener('mouseleave', onLeave)
+            // пауза при наведении
+            const onEnter = () => {
+              hovered = true
+              sync.current()
+            }
+            const onLeave = () => {
+              hovered = false
+              sync.current()
+            }
+            list.addEventListener('mouseenter', onEnter)
+            list.addEventListener('mouseleave', onLeave)
 
-        // вне экрана лента не крутится
-        ScrollTrigger.create({
-          trigger: list,
-          start: 'top bottom',
-          end: 'bottom top',
-          onToggle: (self) => {
-            inView = self.isActive
-            sync.current()
-          },
-        })
+            // вне экрана лента не крутится
+            const stopWatching = watchInView(list, (visible) => {
+              inView = visible
+              sync.current()
+            })
 
-        // C. Появление блока: карточки по очереди
-        gsap.from('[data-review-inner]', {
-          y: reduce ? 0 : 40,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          clearProps: 'opacity,transform',
-          scrollTrigger: { trigger: list, start: 'clamp(top 80%)', once: true },
+            cleanup = () => {
+              stopWatching()
+              list.removeEventListener('mouseenter', onEnter)
+              list.removeEventListener('mouseleave', onLeave)
+              loop.current = null
+              sync.current = () => {}
+            }
+          })
         })
 
         return () => {
-          list.removeEventListener('mouseenter', onEnter)
-          list.removeEventListener('mouseleave', onLeave)
-          loop.current = null
-          sync.current = () => {}
+          cancelled = true
+          cleanup()
         }
       })
     },
-    { scope: root },
+    { scope: root, dependencies: [shown] },
   )
 
   // B. Стрелки листают на одну карточку

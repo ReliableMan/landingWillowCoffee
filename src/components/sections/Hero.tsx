@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container'
 import { OpenStatus } from '@/components/ui/OpenStatus'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { anchors, brand } from '@/data/content'
+import { useAfterIntro } from '@/hooks/useAfterIntro'
 import { useLang } from '@/i18n/useLang'
 import { gsap, media, padLineMasks, SplitText, useGSAP } from '@/lib/gsap'
 import { INTRO, introReady } from '@/lib/intro'
@@ -14,6 +15,7 @@ export function Hero() {
   const root = useRef<HTMLElement>(null)
   // Стартовый таймлайн играет один раз: смена языка или ширины экрана его не перезапускает
   const played = useRef(false)
+  const shown = useAfterIntro()
 
   // Стартовый таймлайн, ≈ 1.8 с (карточка 02 вайрфрейма); шапка входит последней — см. Header
   useGSAP(
@@ -54,7 +56,6 @@ export function Hero() {
             const tl = gsap.timeline({
               // После проигрыша возвращаем чистую разметку: обычный текст и никаких инлайновых стилей
               onComplete: () => {
-                split.revert()
                 gsap.set(parts, { clearProps: 'all' })
                 gsap.set(q('[data-hero-media]'), { clearProps: 'all' })
               },
@@ -73,6 +74,9 @@ export function Hero() {
                 { yPercent: 110, duration: desktop ? 0.55 : 0.8, stagger: desktop ? 0.02 : 0.1 },
                 INTRO.title,
               )
+              // Заголовок возвращаем в обычный текст сразу, как он доехал, не дожидаясь конца таймлайна:
+              // браузер считает «главный элемент страницы показан» (LCP) именно с этого момента
+              .call(() => split.revert(), undefined, '>')
               .from(q('[data-hero-item]'), { y: 30, opacity: 0, duration: 0.4, stagger: 0.1 }, INTRO.body)
               .from(q('[data-hero-badge]'), { scale: 0, duration: 0.6, ease: 'back.out(1.7)' }, INTRO.badge)
 
@@ -88,11 +92,12 @@ export function Hero() {
     { scope: root, dependencies: [lang], revertOnUpdate: true },
   )
 
-  // Постоянные эффекты: вращение текста на бейдже и лёгкий параллакс при скролле
+  // Постоянные эффекты: вращение текста на бейдже и лёгкий параллакс при скролле.
+  // Настраиваются после того, как первый экран показан, — чтобы не задерживать его появление
   useGSAP(
     () => {
       const el = root.current
-      if (!el) return
+      if (!el || !shown) return
       const mm = gsap.matchMedia()
 
       mm.add(media.motion, () => {
@@ -107,7 +112,7 @@ export function Hero() {
           .fromTo('[data-hero-text]', { yPercent: 0, opacity: 1 }, { yPercent: -15, opacity: 0, ease: 'none' }, 0)
       })
     },
-    { scope: root },
+    { scope: root, dependencies: [shown] },
   )
 
   return (

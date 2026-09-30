@@ -4,6 +4,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
 import { gsap, media, SplitText, useGSAP } from '@/lib/gsap'
+import { onceInView } from '@/lib/inView'
 
 // Тайминги цепочки «цифра → полоса → цифра», секунды (PLAN.md, «Блок 08»)
 const STEP = 1.2 // от одной цифры до следующей
@@ -47,7 +48,7 @@ export function Process() {
         splits.forEach((s) => gsap.set(s.chars, { transformPerspective: 500, transformOrigin: '50% 100%' }))
 
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: el, start: 'top 65%', once: true },
+          paused: true,
           onStart: () => {
             played.current = true
           },
@@ -78,7 +79,13 @@ export function Process() {
           }
         })
 
-        return () => splits.forEach((s) => s.revert())
+        // старт — когда верх блока доходит до 65% высоты экрана
+        const stop = onceInView(el, () => tl.play(), 0.65)
+
+        return () => {
+          stop()
+          splits.forEach((s) => s.revert())
+        }
       })
     },
     { scope: root, dependencies: [lang], revertOnUpdate: true },

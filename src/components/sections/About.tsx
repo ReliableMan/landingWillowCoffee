@@ -3,9 +3,11 @@ import { Container } from '@/components/ui/Container'
 import { Placeholder } from '@/components/ui/Placeholder'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { aboutStats } from '@/data/content'
+import { useAfterIntro } from '@/hooks/useAfterIntro'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
-import { gsap, media, padLineMasks, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap'
+import { gsap, media, padLineMasks, SplitText, useGSAP } from '@/lib/gsap'
+import { onceInView } from '@/lib/inView'
 import { introReady } from '@/lib/intro'
 
 export function About() {
@@ -13,6 +15,7 @@ export function About() {
   const root = useRef<HTMLElement>(null)
   // Заголовок выезжает один раз: смена языка после этого его не перезапускает
   const titlePlayed = useRef(false)
+  const shown = useAfterIntro()
   useReveal(root)
   const about = t.about
 
@@ -31,12 +34,11 @@ export function About() {
 
         gsap.set(title, { autoAlpha: 0 })
 
-        ScrollTrigger.create({
-          trigger: title,
-          start: 'clamp(top 75%)',
-          once: true,
-          // Режем на строки в момент показа и только с готовыми шрифтами — так строки совпадают с тем, что на экране
-          onEnter: () => {
+        // Режем на строки в момент показа (верх заголовка на 75% высоты экрана) и только с готовыми шрифтами —
+        // так строки совпадают с тем, что на экране
+        const stop = onceInView(
+          title,
+          () => {
             introReady().then(() => {
               if (cancelled) return
               titlePlayed.current = true
@@ -62,10 +64,12 @@ export function About() {
               })
             })
           },
-        })
+          0.75,
+        )
 
         return () => {
           cancelled = true
+          stop()
         }
       })
     },
@@ -82,7 +86,7 @@ export function About() {
 
       mm.add(media.motion, () => {
         // C. Большое фото раскрывается снизу вверх
-        gsap.fromTo(
+        const reveal = gsap.fromTo(
           frame,
           { clipPath: 'inset(100% 0% 0% 0%)' },
           {
@@ -90,52 +94,51 @@ export function About() {
             duration: 1.2,
             ease: 'expo.out',
             clearProps: 'clipPath',
-            scrollTrigger: { trigger: frame, start: 'clamp(top 80%)', once: true },
+            paused: true,
           },
         )
 
         // D. Счётчики: от 0 до N
-        gsap.from('[data-counter]', {
+        const count = gsap.from('[data-counter]', {
           textContent: 0,
           duration: 1.5,
           ease: 'power1.out',
           snap: { textContent: 1 },
-          scrollTrigger: { trigger: '[data-about-stats]', start: 'clamp(top 80%)', once: true },
+          paused: true,
         })
+
+        const stops = [
+          onceInView(el.querySelector(frame), () => reveal.play()),
+          onceInView(el.querySelector('[data-about-stats]'), () => count.play()),
+        ]
+        return () => stops.forEach((stop) => stop())
       })
 
       mm.add(media.reduce, () => {
-        gsap.from(frame, {
-          opacity: 0,
-          duration: 0.4,
-          clearProps: 'opacity',
-          scrollTrigger: { trigger: frame, start: 'clamp(top 80%)', once: true },
-        })
-      })
-
-      // Только десктоп: картинка внутри рамки уменьшается по скроллу, малое фото едет быстрее страницы
-      mm.add(`${media.desktop} and ${media.motion}`, () => {
-        gsap.fromTo(
-          '[data-about-media]',
-          { scale: 1.3 },
-          {
-            scale: 1,
-            ease: 'none',
-            scrollTrigger: { trigger: frame, start: 'top bottom', end: 'bottom top', scrub: true },
-          },
-        )
-        gsap.fromTo(
-          '[data-about-small]',
-          { yPercent: 0 },
-          {
-            yPercent: -20,
-            ease: 'none',
-            scrollTrigger: { trigger: '[data-about-visual]', start: 'top bottom', end: 'bottom top', scrub: true },
-          },
-        )
+        const fade = gsap.from(frame, { opacity: 0, duration: 0.4, clearProps: 'opacity', paused: true })
+        return onceInView(el.querySelector(frame), () => fade.play())
       })
     },
     { scope: root },
+  )
+
+  // C. Только десктоп: картинка внутри рамки уменьшается по скроллу, малое фото едет быстрее страницы.
+  // Один таймлайн и один ScrollTrigger на оба движения; настраивается после показа первого экрана
+  useGSAP(
+    () => {
+      if (!shown) return
+      const mm = gsap.matchMedia()
+      mm.add(`${media.desktop} and ${media.motion}`, () => {
+        gsap
+          .timeline({
+            defaults: { ease: 'none' },
+            scrollTrigger: { trigger: '[data-about-visual]', start: 'top bottom', end: 'bottom top', scrub: true },
+          })
+          .fromTo('[data-about-media]', { scale: 1.3 }, { scale: 1 }, 0)
+          .fromTo('[data-about-small]', { yPercent: 0 }, { yPercent: -20 }, 0)
+      })
+    },
+    { scope: root, dependencies: [shown] },
   )
 
   return (

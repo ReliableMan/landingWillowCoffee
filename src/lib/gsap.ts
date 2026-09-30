@@ -4,12 +4,11 @@ import { SplitText } from 'gsap/SplitText'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import { Flip } from 'gsap/Flip'
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin'
-import { Draggable } from 'gsap/Draggable'
-import { InertiaPlugin } from 'gsap/InertiaPlugin'
 import { useGSAP } from '@gsap/react'
 
-// InertiaPlugin — из того же пакета gsap: даёт Draggable инерцию и доводку до карточки в карусели отзывов
-gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, ScrollToPlugin, Flip, DrawSVGPlugin, Draggable, InertiaPlugin)
+// Draggable и InertiaPlugin нужны только карусели отзывов — они регистрируются в lib/horizontalLoop.ts,
+// который подгружается отдельным файлом после показа первого экрана
+gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, ScrollToPlugin, Flip, DrawSVGPlugin)
 gsap.defaults({ duration: 0.8, ease: 'power3.out' })
 
 // Маркеры ScrollTrigger для отладки: только в dev и только с ?markers в адресе,
@@ -49,4 +48,4 @@ export function padLineMasks(split: SplitText, em = 0.14) {
   })
 }
 
-export { gsap, ScrollTrigger, SplitText, Flip, Draggable, useGSAP }
+export { gsap, ScrollTrigger, SplitText, Flip, useGSAP }

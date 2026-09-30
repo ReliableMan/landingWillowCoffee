@@ -4,7 +4,8 @@ import { SectionTitle } from '@/components/ui/SectionTitle'
 import { featureIcons } from '@/data/content'
 import { useReveal } from '@/hooks/useReveal'
 import { useLang } from '@/i18n/useLang'
-import { gsap, media, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { gsap, media, useGSAP } from '@/lib/gsap'
+import { batchInView } from '@/lib/inView'
 
 type IconName = (typeof featureIcons)[number]
 
@@ -60,11 +61,10 @@ export function Features() {
         gsap.set(cards, { opacity: 0, y: reduce ? 0 : 60 })
         if (!reduce) cards.forEach((card) => gsap.set(shapesOf(card), { drawSVG: '0%' }))
 
-        // batch: карточки, вошедшие в экран одновременно, появляются по очереди
-        ScrollTrigger.batch(cards, {
-          start: 'clamp(top 85%)',
-          once: true,
-          onEnter: (batch) => {
+        // карточки, вошедшие в экран одновременно, появляются по очереди
+        return batchInView(
+          cards,
+          (batch) => {
             ctx.add(() => {
               gsap.to(batch, {
                 opacity: 1,
@@ -86,7 +86,8 @@ export function Features() {
               })
             })
           },
-        })
+          0.85,
+        )
       })
     },
     { scope: root },

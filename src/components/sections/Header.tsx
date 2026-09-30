@@ -6,11 +6,13 @@ import { Logo } from '@/components/ui/Logo'
 import { anchors } from '@/data/content'
 import { useLang } from '@/i18n/useLang'
 import { scrollState } from '@/lib/anchorScroll'
-import { gsap, media, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { gsap, media, useGSAP } from '@/lib/gsap'
 import { INTRO, introReady } from '@/lib/intro'
 import { lockScroll } from '@/lib/scrollLock'
 
 const navKeys = ['about', 'menu', 'signature', 'gallery', 'contacts'] as const
+/** Шапка начинает прятаться, когда страница прокручена дальше этой отметки (примерно две высоты шапки), px */
+const HIDE_AFTER = 160
 
 export function Header() {
   const { t } = useLang()
@@ -43,44 +45,49 @@ export function Header() {
     mm.add({ motion: media.motion, reduce: media.reduce }, (ctx) => {
       const { reduce } = ctx.conditions as { reduce: boolean }
       let cancelled = false
-
-      // Линия под шапкой появляется, как только страница сдвинулась с самого верха
-      ScrollTrigger.create({
-        start: 8,
-        end: 'max',
-        onToggle: (self) => el.toggleAttribute('data-scrolled', self.isActive),
-      })
-
-      const enableSticky = () => {
-        // При reduced motion шапка просто остаётся на месте
-        if (reduce) return
-        let hidden = false
-        const setHidden = (next: boolean) => {
-          if (next === hidden) return
-          hidden = next
+      // smart-sticky включается после входа шапки; при reduced motion шапка просто остаётся на месте
+      let sticky = false
+      let hidden = false
+      const setHidden = (next: boolean) => {
+        if (next === hidden) return
+        hidden = next
+        ctx.add(() => {
           gsap.to(el, { yPercent: next ? -100 : 0, duration: 0.3, ease: 'power2.out', overwrite: true })
-        }
-        ScrollTrigger.create({
-          start: 0,
-          end: 'max',
-          onUpdate: (self) => {
-            if (openRef.current) return
-            // во время плавного скролла к якорю и при движении вверх шапка видна
-            if (scrollState.auto || self.direction === -1) setHidden(false)
-            else if (self.scroll() > el.offsetHeight * 2) setHidden(true)
-          },
         })
-        // Спрятанная шапка возвращается, когда в неё попадает фокус с клавиатуры
-        const onFocus = () => setHidden(false)
-        el.addEventListener('focusin', onFocus)
-        return () => el.removeEventListener('focusin', onFocus)
       }
 
-      let removeFocus: (() => void) | undefined
+      // Обычный слушатель скролла вместо ScrollTrigger: здесь нужны только положение и направление,
+      // а каждый лишний ScrollTrigger удорожает пересчёт всей страницы
+      let lastY = 0
+      let frame = 0
+      const update = () => {
+        frame = 0
+        const y = window.scrollY
+        // линия под шапкой появляется, как только страница сдвинулась с самого верха
+        el.toggleAttribute('data-scrolled', y > 8)
+        if (sticky && !openRef.current) {
+          // во время плавного скролла к якорю и при движении вверх шапка видна
+          if (scrollState.auto || y < lastY) setHidden(false)
+          else if (y > lastY && y > HIDE_AFTER) setHidden(true)
+        }
+        lastY = y
+      }
+      const onScroll = () => {
+        frame ||= requestAnimationFrame(update)
+      }
+      window.addEventListener('scroll', onScroll, { passive: true })
+      onScroll()
+
+      // Спрятанная шапка возвращается, когда в неё попадает фокус с клавиатуры
+      const onFocus = () => setHidden(false)
+      el.addEventListener('focusin', onFocus)
+
+      const enableSticky = () => {
+        sticky = !reduce
+      }
+
       if (entered.current) {
-        ctx.add(() => {
-          removeFocus = enableSticky()
-        })
+        enableSticky()
       } else {
         // Начальное состояние ставим сразу, саму анимацию — когда готовы шрифты (вместе с hero)
         gsap.set(el, reduce ? { autoAlpha: 0 } : { yPercent: -100 })
@@ -91,11 +98,7 @@ export function Header() {
             gsap.to(el, {
               ...(reduce ? { autoAlpha: 1, duration: 0.4 } : { yPercent: 0, duration: 0.6 }),
               delay: INTRO.header,
-              onComplete: () => {
-                ctx.add(() => {
-                  removeFocus = enableSticky()
-                })
-              },
+              onComplete: enableSticky,
             })
           })
         })
@@ -103,7 +106,9 @@ export function Header() {
 
       return () => {
         cancelled = true
-        removeFocus?.()
+        cancelAnimationFrame(frame)
+        window.removeEventListener('scroll', onScroll)
+        el.removeEventListener('focusin', onFocus)
         el.removeAttribute('data-scrolled')
       }
     })

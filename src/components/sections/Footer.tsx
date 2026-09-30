@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { anchors, brand, contacts, copyright } from '@/data/content'
 import { useLang } from '@/i18n/useLang'
-import { gsap, media, padLineMasks, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap'
+import { gsap, media, padLineMasks, SplitText, useGSAP } from '@/lib/gsap'
+import { onceInView } from '@/lib/inView'
 import { introReady } from '@/lib/intro'
 
 const links = [
@@ -30,11 +31,9 @@ export function Footer() {
 
         gsap.set(wordmark, { autoAlpha: 0 })
 
-        ScrollTrigger.create({
-          trigger: wordmark,
-          start: 'clamp(top 90%)',
-          once: true,
-          onEnter: () => {
+        const stop = onceInView(
+          wordmark,
+          () => {
             introReady().then(() => {
               if (cancelled) return
               played.current = true
@@ -60,10 +59,12 @@ export function Footer() {
               })
             })
           },
-        })
+          0.9,
+        )
 
         return () => {
           cancelled = true
+          stop()
         }
       })
     },

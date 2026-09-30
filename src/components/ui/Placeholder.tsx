@@ -3,8 +3,8 @@ import type { HTMLAttributes } from 'react'
 type Props = HTMLAttributes<HTMLDivElement> & { label: string; tone?: 'sage' | 'accent' }
 
 const tones = {
-  sage: 'bg-sage text-accent-deep/70',
-  accent: 'bg-accent text-paper/80',
+  sage: 'bg-sage text-accent-deep',
+  accent: 'bg-accent text-paper',
 }
 
 // Заглушка фото: подпись говорит, какой кадр сюда встанет
